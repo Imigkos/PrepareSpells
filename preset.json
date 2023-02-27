@@ -1,0 +1,44 @@
+{
+    "Spells": [
+        {
+            "Name": "Fireball",
+            "Text": "A bright streak flashes from your pointing finger to a point you choose within range and then blossoms with a low roar into an explosion of flame. Each creature in a 20-foot-radius sphere centered on that point must make a dexterity saving throw. A target takes 8d6 fire damage on a failed save, or half as much damage on a successful one., The fire spreads around corners. It ignites flammable objects in the area that arent being worn or carried.\n\nWhen you cast this spell using a spell slot of 4th level or higher, the damage increases by 1d6 for each slot level above 3rd.",
+            "Level": 3,
+            "Type": "Instantaneous,1 action"
+        },
+        {
+            "Name": "Find Traps",
+            "Text": "You sense the presence of any trap within range that is within line of sight. A trap, for the purpose of this spell, includes anything that would inflict a sudden or unexpected effect you consider harmful or undesirable, which was specifically intended as such by its creator. Thus, the spell would sense an area affected by the alarm spell, a glyph of warding, or a mechanical pit trap, but it would not reveal a natural weakness in the floor, an unstable ceiling, or a hidden sinkhole., This spell merely reveals that a trap is present. You dont learn the location of each trap, but you do learn the general nature of the danger posed by a trap you sense.\n\n",
+            "Level": 2,
+            "Type": "Instantaneous,1 action"
+        },
+        {
+            "Name": "Burning Hands",
+            "Text": "As you hold your hands with thumbs touching and fingers spread, a thin sheet of flames shoots forth from your outstretched fingertips. Each creature in a 15-foot cone must make a dexterity saving throw. A creature takes 3d6 fire damage on a failed save, or half as much damage on a successful one., The fire ignites any flammable objects in the area that arent being worn or carried.\n\nWhen you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d6 for each slot level above 1st.",
+            "Level": 1,
+            "Type": "Instantaneous,1 action"
+        }
+    ],
+    "Inventory": [
+        {
+            "Name": "Potion of Healing",
+            "Description": "A small vial filled with a red liquid. Heals 2d4+2 hit points.",
+            "Quantity": 1
+        },
+        {
+            "Name": "Rope, Hempen",
+            "Description": "50 feet of rope made from hemp fibers.",
+            "Quantity": 2
+        },
+        {
+            "Name": "Thieves' Tools",
+            "Description": "A set of tools used to pick locks and disarm traps.",
+            "Quantity": 3
+        },
+        {
+            "Name": "Oil, Flask of",
+            "Description": "A glass flask filled with oil that can be ignited.",
+            "Quantity": 1
+        }
+    ]
+}
