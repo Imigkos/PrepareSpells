@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 import json
 import requests
+import threading
 
 level = 0
 modif = 0
@@ -51,7 +52,7 @@ def getPreset():
 def printSpell(spell):
 
     sg.popup(
-        f'Level:{spell.level} || Type:{spell.type}\n\n{spell.text} ', title=spell.name)
+        f'Level:{spell.level} || Type:{spell.type}\n\n{spell.text} ', title=spell.name,keep_on_top=True)
 
 
 def apiJSONparse(spell):
@@ -113,8 +114,7 @@ def addSpell(spell_list):
     window = sg.Window('Prepare Spells', layout, keep_on_top=True)
     event, values = window.read()
     if event == 'Submit':  # if user clicks submit store values
-        spell_list.append(
-            Spell(values['name'], values['text'], values['level'], values['type']))
+        spell_list.append(Spell(values['name'], values['text'], values['level'], values['type']))
         printSpell(spell_list[len(spell_list)-1])
         window.close()
     elif event == 'Search':
@@ -219,7 +219,7 @@ def openInventory(item_list):
             layout = [
                 [sg.Text(f"{item.descr}")],
                 [sg.Input(key='quantity', default_text='1', size=5),
-                 sg.Button('Increase'), sg.Button('Decrease')]
+                 sg.Button('Increase'), sg.Button('Decrease'),sg.Button('Delete')]
             ]
             popup_window = sg.Window(f'{item.name}', layout, keep_on_top=True)
             button, values = popup_window.read()
@@ -233,6 +233,8 @@ def openInventory(item_list):
                     item.quantity -= int(values['quantity'])
                 else:
                     sg.popup('Cannot decrease quantity below zero.')
+            elif button == 'Delete':
+                item_list.remove(item)
         elif event == 'add':
             item_list=addItem(item_list)
         inventory = [[item.name, item.quantity] for item in item_list]
@@ -249,10 +251,11 @@ def spellWindow(spell_list, item_list):
             'Remove Spell', key='remove'), sg.Button('Inventory', key='inventory')],
         [sg.Column([[sg.Button(spell_list[i].name, key=spell_list[i].name)]for i in range(0, len(spell_list), 2)]),
          sg.Column([[sg.Button(spell_list[i].name, key=spell_list[i].name)]for i in range(1, len(spell_list), 2)])],
+        [sg.Text('Max HP:'),sg.Input(size=(3,1),key='maxhp',default_text='0'),sg.Text('Current HP:'),sg.Input(size=(3,1),key='currenthp',default_text='0'),sg.Text('Temp:'),sg.Input(size=(3,1),key='temphp',default_text='0'),sg.Button('Damage',key='dmg'),sg.Input(size=(3,1),key='dmghp',default_text='0')],
         [sg.Exit(), sg.Button('Save As', key='save')]
     ]
 
-    window = sg.Window('Spells', layout, keep_on_top=True)
+    window = sg.Window('DND Manager', layout, keep_on_top=True)
     while True:
         event, values = window.read()
         if event in (None, 'Exit'):
@@ -269,6 +272,21 @@ def spellWindow(spell_list, item_list):
             spellWindow(spell_list, item_list)
         elif event == 'inventory':
             item_list = openInventory(item_list)
+        elif event == 'dmg':
+            maxHP = int(values['maxhp'])
+            curHP = int(values['currenthp'])
+            tempHP = int(values['temphp'])
+            dmgHP = int(values['dmghp'])
+            if dmgHP >= tempHP:
+                dmgHP-=tempHP
+                tempHP = 0
+            else:
+                tempHP -= dmgHP
+                dmgHP = 0
+            curHP -= dmgHP
+            window['maxhp'].update(str(maxHP))
+            window['currenthp'].update(str(curHP))
+            window['temphp'].update(str(tempHP))
         else:
             for i in range(len(spell_list)):
                 if event == spell_list[i].name:
