@@ -50,9 +50,21 @@ def getPreset():
 
 
 def printSpell(spell):
-
-    sg.popup(
-        f'Level:{spell.level} || Type:{spell.type}\n\n{spell.text} ', title=spell.name,keep_on_top=True)
+    layout = [
+        [sg.Text(f'Level:{spell.level} || Type:{spell.type}\n\n{spell.text}',
+                 auto_size_text=True, size=(65, None))],
+        
+        [sg.Button('Cast at level:'),sg.Spin(values=[i for i in range(spell.level,10)], initial_value=spell.level, key='level'), sg.Button('Back')]
+    ]
+    popup_window = sg.Window(f'{spell.name}', layout, keep_on_top=True)
+    button, values = popup_window.read()
+    if button == 'Cast at level:':
+        level = int(values['level']) 
+        popup_window.close()
+        return (level)
+    else:
+        popup_window.close()
+        return (-1)
 
 
 def apiJSONparse(spell):
@@ -107,15 +119,16 @@ def addSpell(spell_list):
     layout = [
         [sg.Text('Name:'), sg.InputText(size=(15, 1), key='name'), sg.Text('Type:'), sg.InputText(size=(
             10, 1), key='type'), sg.Text('Level'), sg.Spin([i for i in range(1, 11)], initial_value=1, key='level')],
-        [sg.Multiline(default_text='Enter spell description here',size=(50, 8), key='text')],
+        [sg.Multiline(default_text='Enter spell description here',
+                      size=(50, 8), key='text')],
         [sg.Submit(), sg.Button('Search'), sg.Cancel()]
     ]
 
     window = sg.Window('Prepare Spells', layout, keep_on_top=True)
     event, values = window.read()
     if event == 'Submit':  # if user clicks submit store values
-        spell_list.append(Spell(values['name'], values['text'], values['level'], values['type']))
-        printSpell(spell_list[len(spell_list)-1])
+        spell_list.append(
+            Spell(values['name'], values['text'], values['level'], values['type']))
         window.close()
     elif event == 'Search':
         searchAPI(spell_list)
@@ -130,7 +143,8 @@ def addItem(item_list):
     layout = [
         [sg.Text('Name:'), sg.InputText(size=(15, 1), key='name'), sg.Text(
             'Quantity:'), sg.InputText(size=(5, 1), key='quantity')],
-        [sg.Multiline(default_text='Enter item description here',size=(50, 8), key='descr')],
+        [sg.Multiline(default_text='Enter item description here',
+                      size=(50, 8), key='descr')],
         [sg.Submit(), sg.Cancel()]
     ]
     window = sg.Window('Add Item', layout, keep_on_top=True)
@@ -204,7 +218,7 @@ def openInventory(item_list):
                   row_height=30, tooltip='Click on an item to get its description',
                   selected_row_colors=(('white', sg.theme_background_color())),
                   auto_size_columns=True, justification='center')],
-        [sg.Button('Add Item',key='add')]
+        [sg.Button('Add Item', key='add')]
     ]
 
     window = sg.Window('Inventory', layout, keep_on_top=True)
@@ -219,7 +233,7 @@ def openInventory(item_list):
             layout = [
                 [sg.Text(f"{item.descr}")],
                 [sg.Input(key='quantity', default_text='1', size=5),
-                 sg.Button('Increase'), sg.Button('Decrease'),sg.Button('Delete')]
+                 sg.Button('Increase'), sg.Button('Decrease'), sg.Button('Delete')]
             ]
             popup_window = sg.Window(f'{item.name}', layout, keep_on_top=True)
             button, values = popup_window.read()
@@ -236,7 +250,7 @@ def openInventory(item_list):
             elif button == 'Delete':
                 item_list.remove(item)
         elif event == 'add':
-            item_list=addItem(item_list)
+            item_list = addItem(item_list)
         inventory = [[item.name, item.quantity] for item in item_list]
         window['table'].update(values=inventory)
     window.close()
@@ -245,14 +259,25 @@ def openInventory(item_list):
 
 def spellWindow(spell_list, item_list):
     sg.theme('DarkBlue1')
+    spell_slots = []
+    for i in range(10):
+        spell_slots.append(0)
 
     layout = [
-        [sg.Button('Add Spell'), sg.Button(
-            'Remove Spell', key='remove'), sg.Button('Inventory', key='inventory')],
+        [sg.Button('Add Spell'), sg.Button('Remove Spell', key='remove'), sg.Button(
+            'Inventory', key='inventory'), sg.Button('Rest', key='rest')],
         [sg.Column([[sg.Button(spell_list[i].name, key=spell_list[i].name)]for i in range(0, len(spell_list), 2)]),
          sg.Column([[sg.Button(spell_list[i].name, key=spell_list[i].name)]for i in range(1, len(spell_list), 2)])],
-        [sg.Text('Max HP:'),sg.Input(size=(3,1),key='maxhp',default_text='0'),sg.Text('Current HP:'),sg.Input(size=(3,1),key='currenthp',default_text='0'),sg.Text('Temp:'),sg.Input(size=(3,1),key='temphp',default_text='0'),sg.Button('Damage',key='dmg'),sg.Input(size=(3,1),key='dmghp',default_text='0')],
-        [sg.Exit(), sg.Button('Save As', key='save')]
+        [sg.Text('Max HP:'), sg.Input(size=(3, 1), key='maxhp', default_text='0'), sg.Text('Current HP:'), sg.Input(size=(3, 1), key='currenthp', default_text='0'), sg.Text(
+            'Temp:'), sg.Input(size=(3, 1), key='temphp', default_text='0'), sg.Button('Damage', key='dmg'), sg.Input(size=(3, 1), key='dmghp', default_text='0')],
+        [sg.Text(f'Level 0:'), sg.Input('0', size=(3, 1), key='l0'), sg.Text(f'Level 1:'), sg.Input('0', size=(3, 1), key='l1'), sg.Text(f'Level 2:'), sg.Input(
+            '0', size=(3, 1), key='l2'), sg.Text(f'Level 3:'), sg.Input('0', size=(3, 1), key='l3'), sg.Text(f'Level 4:'), sg.Input('0', size=(3, 1), key='l4')],
+        [sg.Canvas(size=(500, 1), background_color='lightgray', key='canvas1')],
+        [sg.Text(f'Level 5:'), sg.Input('0', size=(3, 1), key='l5'), sg.Text(f'Level 6:'), sg.Input('0', size=(3, 1), key='l6'), sg.Text(f'Level 7:'), sg.Input(
+            '0', size=(3, 1), key='l7'), sg.Text(f'Level 8:'), sg.Input('0', size=(3, 1), key='l8'), sg.Text(f'Level 9:'), sg.Input('0', size=(3, 1), key='l9')],
+        [sg.Canvas(size=(500, 1), background_color='lightgray', key='canvas2')],
+        [sg.Exit(), sg.Button('Save As', key='save'),
+         sg.Button('Store Max Spell Slots', key='store')],
     ]
 
     window = sg.Window('DND Manager', layout, keep_on_top=True)
@@ -278,7 +303,7 @@ def spellWindow(spell_list, item_list):
             tempHP = int(values['temphp'])
             dmgHP = int(values['dmghp'])
             if dmgHP >= tempHP:
-                dmgHP-=tempHP
+                dmgHP -= tempHP
                 tempHP = 0
             else:
                 tempHP -= dmgHP
@@ -287,7 +312,16 @@ def spellWindow(spell_list, item_list):
             window['maxhp'].update(str(maxHP))
             window['currenthp'].update(str(curHP))
             window['temphp'].update(str(tempHP))
+        elif event == 'store':
+            for i in range(10):
+                spell_slots[i] = int(values[f'l{i}'])
+        elif event == 'rest':
+            for i in range(10):
+                window[f'l{i}'].update(str(spell_slots[i]))
         else:
             for i in range(len(spell_list)):
                 if event == spell_list[i].name:
-                    printSpell(spell_list[i])
+                    castLevel = printSpell(spell_list[i])
+                    if castLevel >= 0:
+                        window[f'l{castLevel}'].update(
+                            str(int(values[f'l{castLevel}'])-1))
