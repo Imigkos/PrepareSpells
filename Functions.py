@@ -5,6 +5,7 @@ import threading
 
 level = 0
 modif = 0
+spell_slots = [0,0,0,0,0,0,0,0,0,0]
 
 
 class Spell:
@@ -118,7 +119,7 @@ def addSpell(spell_list):
 
     layout = [
         [sg.Text('Name:'), sg.InputText(size=(15, 1), key='name'), sg.Text('Type:'), sg.InputText(size=(
-            10, 1), key='type'), sg.Text('Level'), sg.Spin([i for i in range(1, 11)], initial_value=1, key='level')],
+            10, 1), key='type'), sg.Text('Level'), sg.Spin([i for i in range(0, 10)], initial_value=1, key='level')],
         [sg.Multiline(default_text='Enter spell description here',
                       size=(50, 8), key='text')],
         [sg.Submit(), sg.Button('Search'), sg.Cancel()]
@@ -259,9 +260,7 @@ def openInventory(item_list):
 
 def spellWindow(spell_list, item_list):
     sg.theme('DarkBlue1')
-    spell_slots = []
-    for i in range(10):
-        spell_slots.append(0)
+    global spell_slots
 
     layout = [
         [sg.Button('Add Spell'), sg.Button('Remove Spell', key='remove'), sg.Button(
