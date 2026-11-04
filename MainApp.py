@@ -1,10 +1,14 @@
-import PySimpleGUI as sg
-import Functions as f
+"""Launch the spell and inventory manager."""
 
-spell_list, item_list = f.getPreset();
-exitapp = 0
+import Functions as functions
 
 
-while exitapp == 0:   
-    exitapp = f.spellWindow(spell_list,item_list)
-    
+def main():
+    """Load a preset and open the application."""
+    spell_list, item_list = functions.getPreset()
+    while not functions.spellWindow(spell_list, item_list):
+        pass
+
+
+if __name__ == "__main__":
+    main()

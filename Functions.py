@@ -1,7 +1,6 @@
 import PySimpleGUI as sg
 import json
 import requests
-import threading
 
 level = 0
 modif = 0
@@ -71,12 +70,16 @@ def printSpell(spell):
 def apiJSONparse(spell):
     url = 'https://www.dnd5eapi.co/api/spells/'+spell
 
-    response = requests.get(url)
+    try:
+        response = requests.get(url, timeout=10)
+    except requests.RequestException:
+        sg.popup('Could not reach the spell API. Please try again.')
+        return None
 
     if response.status_code == 200:
         data = response.json()
         name = data['name']
-        text = str(data['desc'])+'\n\n'+str(data['higher_level'])
+        text = str(data['desc'])+'\n\n'+str(data.get('higher_level', []))
         text = text.replace('[', '').replace(']', '').replace(
             '"', '').replace("'", '')
         level = data['level']
@@ -171,7 +174,9 @@ def removeSpell(spell_list):
     selectedSpell = ''
     while True:
         event, values = window.read()
-        if event != 'Submit' and event != 'Cancel':
+        if event in (sg.WIN_CLOSED, 'Cancel'):
+            break
+        if event != 'Submit':
             if selectedSpell:
                 window[selectedSpell].update(button_color=default_color)
             selectedSpell = event
@@ -206,7 +211,9 @@ def savePreset(spell_list, item_list):
         inventory_dicts.append(inventory_dict)
     filename = sg.popup_get_file("Save list as", save_as=True, file_types=(
         ("JSON Files", "*.json")), keep_on_top=True)
-    with open(filename, "w") as file:
+    if not filename:
+        return
+    with open(filename, "w", encoding="utf-8") as file:
         # Write the list to the file using json.dump()
         json.dump({"Spells": spell_dicts,
                   "Inventory": inventory_dicts}, file, indent=4)
